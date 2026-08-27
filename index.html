@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FIDR TAGS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#faf9f6;
+    --panel-bg:#f2f0ea;
+    --ink:#2b2b33;
+    --ink-soft:#767683;
+    --ink-faint:#a9a9b3;
+    --white:#ffffff;
+
+    --apricot:#ffd9b3;
+    --apricot-deep:#f5a94e;
+    --coral:#ffb3ae;
+    --coral-deep:#f2726b;
+    --sage:#bfe3c8;
+    --sage-deep:#5fb583;
+    --butter:#ffedA6;
+    --butter-deep:#e8c23c;
+    --lavender:#dcd6f7;
+    --lavender-deep:#9b8bef;
+    --sky:#bfe1f5;
+    --sky-deep:#4fa6d8;
+
+    --r-sheet:28px;
+    --r-card:22px;
+    --r-control:14px;
+    --shadow-soft:0 2px 10px rgba(43,43,51,.06);
+    --shadow-pop:0 10px 30px rgba(43,43,51,.16);
+    --font: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1c1c22; --panel-bg:#222229; --ink:#f2f1f5; --ink-soft:#b6b5c2; --ink-faint:#7c7b88;
+      --white:#2a2a33;
+      --apricot:#6a4f30; --apricot-deep:#f5a94e;
+      --coral:#5b3634; --coral-deep:#ff8b83;
+      --sage:#294a37; --sage-deep:#7fd3a0;
+      --butter:#5a4d20; --butter-deep:#f0d868;
+      --lavender:#3a3560; --lavender-deep:#bcaefc;
+      --sky:#264255; --sky-deep:#7cc4ee;
+      --shadow-soft:0 2px 10px rgba(0,0,0,.35);
+      --shadow-pop:0 10px 30px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1c1c22; --panel-bg:#222229; --ink:#f2f1f5; --ink-soft:#b6b5c2; --ink-faint:#7c7b88;
+    --white:#2a2a33;
+    --apricot:#6a4f30; --apricot-deep:#f5a94e;
+    --coral:#5b3634; --coral-deep:#ff8b83;
+    --sage:#294a37; --sage-deep:#7fd3a0;
+    --butter:#5a4d20; --butter-deep:#f0d868;
+    --lavender:#3a3560; --lavender-deep:#bcaefc;
+    --sky:#264255; --sky-deep:#7cc4ee;
+    --shadow-soft:0 2px 10px rgba(0,0,0,.35);
+    --shadow-pop:0 10px 30px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink); font-family:var(--font);
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  button, input{font-family:inherit;}
+  h1,h2,h3,p{margin:0;}
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+
+  /* ---------- layout shell ---------- */
+  .app-wrap{
+    min-height:100dvh; display:flex; align-items:stretch; justify-content:center;
+  }
+  .phone-frame{
+    position:relative; width:100%; max-width:430px; margin:0 auto;
+    background:var(--bg); display:flex; flex-direction:column; min-height:100dvh;
+  }
+  .screen-viewport{
+    position:relative; flex:1; overflow:hidden;
+  }
+  .screen{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    opacity:0; transform:translateY(8px); pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding:18px 18px calc(18px + env(safe-area-inset-bottom)) 18px;
+  }
+  .screen.active{ opacity:1; transform:translateY(0); pointer-events:auto; }
+
+  /* ---------- header ---------- */
+  .screen-header{
+    display:flex; align-items:center; gap:10px; padding:6px 2px 18px 2px; flex-shrink:0;
+  }
+  .icon-btn{
+    width:40px; height:40px; border-radius:50%; border:none; background:var(--white);
+    box-shadow:var(--shadow-soft); display:flex; align-items:center; justify-content:center;
+    color:var(--ink); cursor:pointer; flex-shrink:0; transition:transform .15s ease, background .15s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .icon-btn:active{ transform:scale(.92); }
+  .icon-btn svg{width:20px;height:20px;}
+  .screen-title{ font-size:1.15rem; font-weight:800; flex:1; }
+  .badge{
+    position:absolute; top:-2px; right:-2px; min-width:16px; height:16px; padding:0 4px;
+    border-radius:8px; background:var(--coral-deep); color:#fff; font-size:.62rem; font-weight:800;
+    display:flex; align-items:center; justify-content:center; line-height:1;
+  }
+  .icon-btn-wrap{position:relative;}
+
+  /* ---------- generic bits ---------- */
+  .card{
+    background:var(--white); border-radius:var(--r-card); padding:16px; box-shadow:var(--shadow-soft);
+  }
+  .stack{ display:flex; flex-direction:column; gap:12px; }
+  .row{ display:flex; align-items:center; gap:12px; }
+  .row.between{ justify-content:space-between; }
+  .muted{ color:var(--ink-soft); font-size:.85rem; }
+  .pill{
+    display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px;
+    font-weight:700; font-size:.78rem;
+  }
+  .btn{
+    appearance:none; border:none; cursor:pointer; border-radius:var(--r-control);
+    padding:14px 18px; font-weight:800; font-size:.95rem; color:var(--ink);
+    transition:transform .12s ease, filter .12s ease; -webkit-tap-highlight-color:transparent;
+  }
+  .btn:active{ transform:scale(.97); }
+  .btn.block{ width:100%; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .btn-coral{ background:var(--coral); }
+  .btn-coral-deep{ background:var(--coral-deep); color:#fff; }
+  .btn-sage{ background:var(--sage); }
+  .btn-butter{ background:var(--butter); }
+  .btn-sky{ background:var(--sky); }
+  .btn-lavender{ background:var(--lavender); }
+  .btn-ghost{ background:var(--panel-bg); color:var(--ink-soft); }
+  .btn-outline{ background:transparent; box-shadow:inset 0 0 0 2px var(--panel-bg); color:var(--ink-soft); }
+
+  .toast{
+    position:absolute; left:18px; right:18px; bottom:18px; background:var(--ink); color:var(--bg);
+    padding:12px 16px; border-radius:var(--r-control); font-weight:700; font-size:.85rem;
+    box-shadow:var(--shadow-pop); text-align:center; opacity:0; transform:translateY(12px);
+    transition:opacity .2s ease, transform .2s ease; pointer-events:none; z-index:50;
+  }
+  .toast.show{ opacity:1; transform:translateY(0); }
+
+  .avatar{
+    border-radius:50%; background:var(--panel-bg); display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; overflow:hidden;
+  }
+  .avatar svg{ width:70%; height:70%; }
+
+  .lock-note{ display:flex; align-items:center; gap:8px; color:var(--lavender-deep); font-weight:700; font-size:.75rem; }
+  .lock-note svg{ width:14px; height:14px; }
+
+  section#screen-profile .avatar, section#screen-settings .avatar{ width:84px; height:84px; background:var(--sky); }
+
+  /* ---------- Profile ---------- */
+  .profile-top{ display:flex; flex-direction:column; align-items:center; gap:6px; margin-bottom:16px; }
+  .username-line{ font-weight:800; color:var(--ink-soft); }
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{
+    background:var(--sage); padding:8px 12px; border-radius:999px; font-weight:700; font-size:.8rem;
+    display:flex; align-items:center; gap:6px;
+  }
+  .chip svg{ width:16px; height:16px; }
+  .cta-scan{
+    background:linear-gradient(135deg, var(--coral-deep), var(--coral));
+    color:#fff; padding:18px; border-radius:var(--r-card); text-align:center;
+    box-shadow:var(--shadow-soft); cursor:pointer; border:none; width:100%;
+  }
+  .cta-scan .big{ font-size:1.05rem; font-weight:800; letter-spacing:.02em; }
+  .lost-row{ display:flex; align-items:center; gap:10px; background:var(--butter); border-radius:var(--r-control); padding:12px; }
+  .stat-pair{ display:flex; gap:12px; }
+  .stat-pill{ flex:1; background:var(--panel-bg); border-radius:var(--r-control); padding:12px; text-align:center; }
+  .stat-pill .num{ font-size:1.3rem; font-weight:800; display:block; }
+
+  /* ---------- Scan ---------- */
+  .viewfinder{
+    position:relative; aspect-ratio:1/1; background:var(--ink); border-radius:var(--r-card);
+    overflow:hidden; display:flex; align-items:center; justify-content:center; margin:8px 0 22px;
+  }
+  .viewfinder .corner{ position:absolute; width:26px; height:26px; border:3px solid var(--sage-deep); }
+  .viewfinder .corner.tl{ top:14px; left:14px; border-right:none; border-bottom:none; border-radius:8px 0 0 0; }
+  .viewfinder .corner.tr{ top:14px; right:14px; border-left:none; border-bottom:none; border-radius:0 8px 0 0; }
+  .viewfinder .corner.bl{ bottom:14px; left:14px; border-right:none; border-top:none; border-radius:0 0 0 8px; }
+  .viewfinder .corner.br{ bottom:14px; right:14px; border-left:none; border-top:none; border-radius:0 0 8px 0; }
+  .sticker-target{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .sticker-target .disc{
+    width:96px; height:96px; border-radius:50%; background:var(--white); display:flex;
+    align-items:center; justify-content:center; box-shadow:0 0 0 6px rgba(255,255,255,.08);
+  }
+  .sticker-target .disc svg{ width:60px; height:60px; }
+  .scan-me-pill{ background:var(--white); color:var(--ink); font-weight:800; font-size:.7rem; padding:4px 10px; border-radius:999px; }
+  .scan-line{
+    position:absolute; left:8%; right:8%; height:3px; border-radius:3px;
+    background:var(--sage-deep); box-shadow:0 0 12px var(--sage-deep); top:14%;
+    opacity:0; transition:opacity .2s ease;
+  }
+  .viewfinder.scanning .scan-line{ opacity:1; animation:scanmove 1.1s ease-in-out infinite; }
+  @keyframes scanmove{ 0%{top:14%;} 50%{top:82%;} 100%{top:14%;} }
+  .scan-status{ min-height:1.4em; text-align:center; font-weight:800; color:var(--sage-deep); margin-bottom:14px; }
+  .scan-btn-wrap{ display:flex; justify-content:center; margin-top:auto; padding-top:10px; }
+  .scan-btn{
+    width:76px; height:76px; border-radius:50%; background:var(--coral-deep); border:5px solid var(--white);
+    box-shadow:var(--shadow-pop); cursor:pointer;
+  }
+  .scan-btn:active{ transform:scale(.94); }
+
+  /* ---------- Found sticker ---------- */
+  .found-card{
+    background:linear-gradient(180deg, var(--butter), var(--coral));
+    border-radius:var(--r-sheet); padding:22px; text-align:center; margin-bottom:16px;
+  }
+  .found-card .avatar{ width:88px; height:88px; margin:0 auto 10px; background:var(--white); }
+  .found-card .handle{ font-weight:800; font-size:1.05rem; }
+  .notice-banner{
+    margin-top:14px; background:rgba(255,255,255,.55); border-radius:var(--r-control); padding:10px 14px;
+    font-weight:700; font-size:.82rem; display:none; align-items:center; gap:8px; justify-content:center;
+  }
+  .notice-banner.show{ display:flex; }
+  .other-items{ margin:16px 0; }
+  .action-row{
+    display:flex; align-items:center; gap:12px; background:var(--white); border-radius:var(--r-control);
+    padding:14px; box-shadow:var(--shadow-soft); cursor:pointer; border:none; width:100%; text-align:left;
+  }
+  .action-row .ic{ width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .action-row .ic svg{ width:18px; height:18px; }
+
+  /* ---------- Messaging ---------- */
+  .chat-area{ flex:1; display:flex; flex-direction:column; gap:10px; padding:4px 2px 12px; overflow-y:auto; }
+  .bubble{ max-width:76%; padding:10px 14px; border-radius:18px; font-size:.92rem; font-weight:600; line-height:1.35; }
+  .bubble.them{ align-self:flex-start; background:var(--lavender); border-bottom-left-radius:6px; }
+  .bubble.me{ align-self:flex-end; background:var(--sky); border-bottom-right-radius:6px; }
+  .composer{
+    display:flex; gap:10px; align-items:center; padding-top:10px; flex-shrink:0;
+  }
+  .composer input{
+    flex:1; border:none; background:var(--panel-bg); border-radius:999px; padding:13px 16px;
+    font-size:.92rem; color:var(--ink); outline:none;
+  }
+  .send-btn{
+    width:44px; height:44px; border-radius:50%; background:var(--coral-deep); border:none; color:#fff;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;
+  }
+  .send-btn svg{ width:18px; height:18px; }
+  .goback-row{ text-align:center; padding-top:12px; }
+  .goback-row button{ background:none; border:none; color:var(--ink-soft); font-weight:800; cursor:pointer; padding:8px; }
+
+  /* ---------- Location ---------- */
+  .map{
+    position:relative; border-radius:var(--r-card); overflow:hidden; background:var(--sage);
+    aspect-ratio:3/4; margin-bottom:16px;
+  }
+  .map .road{ position:absolute; left:50%; top:0; bottom:0; width:14%; transform:translateX(-50%); background:var(--ink-faint); opacity:.35; }
+  .map .road::after{ content:''; position:absolute; left:50%; top:0; bottom:0; width:2px; transform:translateX(-50%);
+    background-image:linear-gradient(var(--white) 50%, transparent 0); background-size:2px 18px; }
+  .map .block{ position:absolute; background:var(--apricot); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.72rem; color:var(--ink); text-align:center; padding:4px; }
+  .map .pin{ position:absolute; width:34px; height:34px; transform:translate(-50%,-100%); animation:pinbounce 1.6s ease-in-out infinite; }
+  .map .pin svg{ width:100%; height:100%; }
+  .map .pin-label{
+    position:absolute; transform:translate(-50%, 4px); background:var(--coral-deep); color:#fff; font-weight:800;
+    font-size:.68rem; padding:3px 8px; border-radius:8px; white-space:nowrap;
+  }
+  @keyframes pinbounce{ 0%,100%{ transform:translate(-50%,-100%);} 50%{ transform:translate(-50%,-112%);} }
+
+  /* ---------- Shop ---------- */
+  .price-legend{ display:flex; gap:8px; margin-bottom:14px; }
+  .price-legend .pill{ flex:1; justify-content:center; }
+  .shop-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+  .shop-item{
+    background:var(--white); border-radius:var(--r-control); padding:12px 6px; box-shadow:var(--shadow-soft);
+    display:flex; flex-direction:column; align-items:center; gap:6px; border:none; cursor:pointer;
+  }
+  .shop-item svg{ width:38px; height:38px; }
+  .shop-item span{ font-size:.68rem; font-weight:700; color:var(--ink-soft); text-align:center; }
+
+  .sheet-backdrop{
+    position:absolute; inset:0; background:rgba(20,20,26,.4); opacity:0; pointer-events:none;
+    transition:opacity .2s ease; z-index:60; display:flex; align-items:flex-end;
+  }
+  .sheet-backdrop.show{ opacity:1; pointer-events:auto; }
+  .sheet{
+    background:var(--bg); width:100%; border-radius:26px 26px 0 0; padding:22px 20px calc(22px + env(safe-area-inset-bottom));
+    transform:translateY(100%); transition:transform .25s ease; box-shadow:var(--shadow-pop);
+  }
+  .sheet-backdrop.show .sheet{ transform:translateY(0); }
+  .size-opt{
+    display:flex; align-items:center; justify-content:space-between; padding:14px; border-radius:var(--r-control);
+    background:var(--panel-bg); margin-bottom:10px; cursor:pointer; font-weight:700;
+  }
+  .size-opt.selected{ background:var(--sky); box-shadow:inset 0 0 0 2px var(--sky-deep); }
+
+  /* ---------- Bag ---------- */
+  .bag-item{ display:flex; align-items:center; gap:12px; background:var(--white); border-radius:var(--r-control); padding:12px; box-shadow:var(--shadow-soft); }
+  .bag-item .ic{ width:44px; height:44px; border-radius:12px; background:var(--panel-bg); display:flex; align-items:center; justify-content:center; }
+  .bag-item .ic svg{ width:26px; height:26px; }
+  .bag-item .meta{ flex:1; }
+  .bag-item .meta .name{ font-weight:800; font-size:.9rem; }
+  .bag-item .price{ font-weight:800; }
+  .bag-item .remove{ background:none; border:none; color:var(--ink-faint); cursor:pointer; padding:4px; }
+  .bag-total{ display:flex; justify-content:space-between; align-items:center; padding:14px 4px; font-weight:800; font-size:1.1rem; }
+  .empty-note{ text-align:center; color:var(--ink-faint); padding:30px 10px; font-weight:700; }
+
+  /* ---------- Subscriptions / Cost ---------- */
+  .plan-table{ display:grid; grid-template-columns:1.3fr repeat(3,1fr); gap:1px; background:var(--panel-bg); border-radius:var(--r-card); overflow:hidden; }
+  .plan-table .cell{ background:var(--white); padding:10px 6px; font-size:.72rem; font-weight:700; text-align:center; display:flex; align-items:center; justify-content:center; }
+  .plan-table .cell.head{ font-weight:800; font-size:.78rem; background:var(--lavender); }
+  .plan-table .cell.row-head{ justify-content:flex-start; text-align:left; font-weight:800; background:var(--panel-bg); font-size:.7rem; }
+  .plan-table .cell.current{ background:var(--sky); }
+  .plan-picks{ display:grid; grid-template-columns:1.3fr repeat(3,1fr); gap:8px; margin-top:10px; }
+  .plan-picks .pick-btn{ font-size:.7rem; padding:8px 4px; border-radius:10px; }
+  .cost-list .cost-row{ display:flex; justify-content:space-between; padding:12px 4px; border-bottom:1px solid var(--panel-bg); font-weight:700; }
+  .cost-row.current{ color:var(--sage-deep); }
+
+  /* ---------- Settings ---------- */
+  .field{ background:var(--white); border-radius:var(--r-control); padding:12px 14px; box-shadow:var(--shadow-soft); }
+  .field label{ display:block; font-size:.68rem; color:var(--ink-faint); font-weight:800; text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px; }
+  .field .field-row{ display:flex; align-items:center; gap:8px; }
+  .field input{ border:none; background:transparent; font-weight:700; font-size:.95rem; color:var(--ink); flex:1; outline:none; padding:0; }
+  .field .edit-icon{ background:none; border:none; color:var(--lavender-deep); cursor:pointer; flex-shrink:0; }
+  .field .edit-icon svg{ width:18px; height:18px; }
+  .settings-avatar{ display:flex; flex-direction:column; align-items:center; gap:8px; margin:4px 0 4px; }
+  .cycle-btn{ font-size:.72rem; padding:8px 14px; }
+  .check-row{ display:flex; align-items:center; gap:12px; background:var(--white); border-radius:var(--r-control); padding:12px 14px; box-shadow:var(--shadow-soft); }
+  .checkbox{ width:22px; height:22px; border-radius:7px; background:var(--panel-bg); display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; }
+  .checkbox.checked{ background:var(--sage-deep); }
+  .checkbox svg{ width:14px; height:14px; opacity:0; transition:opacity .12s ease; }
+  .checkbox.checked svg{ opacity:1; }
+  .reset-link{ text-align:center; }
+  .reset-link button{ background:none; border:none; color:var(--ink-faint); font-weight:700; text-decoration:underline; cursor:pointer; padding:10px; }
+
+  /* ---------- Call overlay ---------- */
+  .call-overlay{
+    position:absolute; inset:0; background:var(--ink); color:#fff; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:18px; opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:70;
+  }
+  .call-overlay.show{ opacity:1; pointer-events:auto; }
+  .call-overlay .avatar{ width:96px; height:96px; background:#3a3a45; }
+  .call-overlay .status{ font-weight:700; color:#cfcfe0; }
+  .call-overlay .hangup{ width:60px; height:60px; border-radius:50%; background:var(--coral-deep); border:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .call-overlay .hangup svg{ width:26px; height:26px; }
+
+  /* ---------- desktop layout ---------- */
+  .info-panel{ display:none; }
+  @media (min-width:900px){
+    .app-wrap{ gap:56px; align-items:center; padding:40px 24px; }
+    .phone-frame{
+      width:390px; height:844px; min-height:0; flex:0 0 auto; margin:0;
+      border-radius:48px; box-shadow:var(--shadow-pop); border:10px solid var(--ink);
+      background:var(--bg);
+    }
+    :root:not([data-theme="light"]) .phone-frame{ border-color:#000; }
+    .info-panel{
+      display:flex; flex-direction:column; gap:18px; max-width:380px; color:var(--ink);
+    }
+    .info-panel h1{ font-size:2rem; font-weight:800; }
+    .info-panel .tagline{ color:var(--ink-soft); font-weight:600; line-height:1.5; }
+    .info-panel .feature{
+      display:flex; gap:12px; align-items:flex-start; background:var(--panel-bg); border-radius:var(--r-card); padding:14px 16px;
+    }
+    .info-panel .feature svg{ width:22px; height:22px; flex-shrink:0; color:var(--sage-deep); }
+    .info-panel .feature .t{ font-weight:800; font-size:.92rem; }
+    .info-panel .feature .d{ font-weight:600; font-size:.8rem; color:var(--ink-soft); }
+    .info-panel .jump-title{ font-weight:800; font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); margin-top:6px; }
+    .jump-grid{ display:flex; flex-wrap:wrap; gap:8px; }
+    .jump-grid button{
+      background:var(--white); border:none; border-radius:999px; padding:8px 14px; font-weight:700; font-size:.78rem;
+      cursor:pointer; box-shadow:var(--shadow-soft); color:var(--ink);
+    }
+    .jump-grid button.active{ background:var(--lavender-deep); color:#fff; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ ICON SPRITE ============ -->
+<svg class="visually-hidden" aria-hidden="true">
+<defs>
+
+  <!-- object stickers -->
+  <symbol id="ic-whale" viewBox="0 0 64 64">
+    <path d="M6 32c0-11 11-18 24-18 12 0 22 6 26 15 1.6 3.6-.5 5-3 5.6l4.4 3.4-8 .6c-3.6 6.8-12 11.4-21.4 11.4C15 50 6 42.5 6 32z" fill="var(--sky)"/>
+    <circle cx="23" cy="27" r="3.4" fill="var(--ink)"/>
+    <path d="M13 38c5 3.4 12 5.4 19 5.4" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linecap="round" fill="none"/>
+  </symbol>
+
+  <symbol id="ic-daisy" viewBox="0 0 64 64">
+    <g fill="var(--butter)">
+      <ellipse cx="32" cy="14" rx="7" ry="11"/>
+      <ellipse cx="32" cy="50" rx="7" ry="11"/>
+      <ellipse cx="14" cy="32" rx="11" ry="7"/>
+      <ellipse cx="50" cy="32" rx="11" ry="7"/>
+      <ellipse cx="19" cy="19" rx="7" ry="10" transform="rotate(-45 19 19)"/>
+      <ellipse cx="45" cy="19" rx="7" ry="10" transform="rotate(45 45 19)"/>
+      <ellipse cx="19" cy="45" rx="7" ry="10" transform="rotate(45 19 45)"/>
+      <ellipse cx="45" cy="45" rx="7" ry="10" transform="rotate(-45 45 45)"/>
+    </g>
+    <circle cx="32" cy="32" r="9" fill="var(--apricot-deep)"/>
+  </symbol>
+
+  <symbol id="ic-coralflower" viewBox="0 0 64 64">
+    <g fill="var(--coral)">
+      <path d="M32 32 20 10c8-4 16-4 24 0z"/>
+      <path d="M32 32 54 20c4 8 4 16 0 24z"/>
+      <path d="M32 32 44 54c-8 4-16 4-24 0z"/>
+      <path d="M32 32 10 44c-4-8-4-16 0-24z"/>
+    </g>
+    <circle cx="32" cy="32" r="8" fill="var(--coral-deep)"/>
+  </symbol>
+
+  <symbol id="ic-smiley" viewBox="0 0 64 64">
+    <circle cx="32" cy="32" r="26" fill="var(--butter)"/>
+    <circle cx="23" cy="28" r="3.4" fill="var(--ink)"/>
+    <circle cx="41" cy="28" r="3.4" fill="var(--ink)"/>
+    <path d="M20 38c4 6 20 6 24 0" stroke="var(--ink)" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+  </symbol>
+
+  <symbol id="ic-drink" viewBox="0 0 64 64">
+    <path d="M16 22h32l-4 30a4 4 0 0 1-4 3.6H24A4 4 0 0 1 20 52z" fill="var(--apricot)"/>
+    <ellipse cx="32" cy="22" rx="16" ry="5" fill="var(--apricot-deep)"/>
+    <rect x="34" y="8" width="5" height="20" rx="2.5" fill="var(--sky-deep)" transform="rotate(18 34 8)"/>
+  </symbol>
+
+  <symbol id="ic-palm" viewBox="0 0 64 64">
+    <path d="M30 58V34c0-6 2-10 5-13" stroke="#a9764f" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <g fill="var(--sage-deep)">
+      <path d="M35 22c-8-2-16-10-18-16 10 0 20 6 22 14z"/>
+      <path d="M35 22c2-9 10-16 20-17 0 10-8 18-16 20z"/>
+      <path d="M35 22c-9 1-19-3-24-9 8-5 20-4 27 3z"/>
+      <path d="M35 22c8-3 19-1 25 5-7 6-19 6-27 1z"/>
+    </g>
+  </symbol>
+
+  <symbol id="ic-pine" viewBox="0 0 64 64">
+    <rect x="29" y="46" width="6" height="10" rx="2" fill="#a9764f"/>
+    <path d="M32 6 46 26H18z" fill="var(--sage-deep)"/>
+    <path d="M32 18 48 38H16z" fill="var(--sage-deep)"/>
+    <path d="M32 30 50 50H14z" fill="var(--sage-deep)"/>
+  </symbol>
+
+  <symbol id="ic-mug" viewBox="0 0 64 64">
+    <path d="M14 20h30v22a10 10 0 0 1-10 10H24a10 10 0 0 1-10-10z" fill="var(--sky)"/>
+    <path d="M44 24h5a8 8 0 0 1 0 16h-5" fill="none" stroke="var(--sky-deep)" stroke-width="5"/>
+    <ellipse cx="29" cy="20" rx="15" ry="4" fill="var(--sky-deep)"/>
+  </symbol>
+
+  <symbol id="ic-apple" viewBox="0 0 64 64">
+    <path d="M32 24c9-8 22-3 22 10 0 13-10 22-19 22-2 0-4-.6-6-1.6-2 1-4 1.6-6 1.6-9 0-19-9-19-22 0-13 13-18 22-10z" fill="var(--coral)"/>
+    <path d="M32 24c0-6 2-11 8-14" stroke="#a9764f" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+    <ellipse cx="41" cy="12" rx="6" ry="3.4" fill="var(--sage-deep)" transform="rotate(-25 41 12)"/>
+  </symbol>
+
+  <symbol id="ic-book" viewBox="0 0 64 64">
+    <path d="M32 18c-6-5-14-6-20-4v30c6-2 14-1 20 4z" fill="var(--sky)"/>
+    <path d="M32 18c6-5 14-6 20-4v30c-6-2-14-1-20 4z" fill="var(--lavender)"/>
+    <path d="M32 18v30" stroke="var(--white)" stroke-width="2"/>
+  </symbol>
+
+  <symbol id="ic-tulip" viewBox="0 0 64 64">
+    <path d="M32 58V30" stroke="var(--sage-deep)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M32 30c-8 0-10-14-10-14 8-2 10 6 10 6s2-8 10-6c0 0-2 14-10 14z" fill="var(--sage-deep)" opacity=".001"/>
+    <path d="M18 34c8 4 20 4 28 0-2-14-9-24-14-24s-12 10-14 24z" fill="var(--coral)"/>
+    <path d="M32 10c-4 4-6 12-6 20h12c0-8-2-16-6-20z" fill="var(--coral-deep)"/>
+  </symbol>
+
+  <symbol id="ic-figure" viewBox="0 0 64 64">
+    <ellipse cx="32" cy="46" rx="14" ry="12" fill="var(--butter-deep)"/>
+    <circle cx="32" cy="22" r="14" fill="var(--butter-deep)"/>
+    <path d="M20 44c-4 3-6 8-6 8M44 44c4 3 6 8 6 8" stroke="var(--butter-deep)" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <circle cx="27" cy="20" r="2.6" fill="var(--ink)"/>
+    <circle cx="37" cy="20" r="2.6" fill="var(--ink)"/>
+    <path d="M26 27c2 3 10 3 12 0" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+  </symbol>
+
+  <!-- UI icons -->
+  <symbol id="ic-bag" viewBox="0 0 24 24">
+    <path d="M6 8h12l1.2 12.2A2 2 0 0 1 17.2 22H6.8a2 2 0 0 1-2-1.8L6 8z" fill="currentColor"/>
+    <path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-back" viewBox="0 0 24 24">
+    <path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="ic-edit" viewBox="0 0 24 24">
+    <path d="M4 20l1-4.6L15.3 5.1a1.5 1.5 0 0 1 2.1 0l1.5 1.5a1.5 1.5 0 0 1 0 2.1L8.6 19 4 20z" fill="currentColor"/>
+  </symbol>
+  <symbol id="ic-message" viewBox="0 0 24 24">
+    <path d="M4 5h16v11H9l-4 4v-4H4z" fill="currentColor"/>
+  </symbol>
+  <symbol id="ic-call" viewBox="0 0 24 24">
+    <path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.8-.4 1.1-.2 1.2.5 2.5.8 3.9.8.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.5 21 3 13.5 3 4c0-.6.4-1 1-1h3.2c.6 0 1 .4 1 1 0 1.4.3 2.7.8 3.9.1.4 0 .8-.2 1.1z" fill="currentColor"/>
+  </symbol>
+  <symbol id="ic-hangup" viewBox="0 0 24 24">
+    <path d="M2 13.5c6-5 14-5 20 0l-.6 3a1.3 1.3 0 0 1-1.8 1l-3-1.2a1.3 1.3 0 0 1-.8-1.3l.2-1.8c-2.6-.9-5.4-.9-8 0l.2 1.8a1.3 1.3 0 0 1-.8 1.3l-3 1.2a1.3 1.3 0 0 1-1.8-1z" fill="currentColor"/>
+  </symbol>
+  <symbol id="ic-check" viewBox="0 0 24 24">
+    <path d="M4 12.5 9.5 18 20 6" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="ic-close" viewBox="0 0 24 24">
+    <path d="M5 5l14 14M19 5 5 19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-pin" viewBox="0 0 24 24">
+    <path d="M12 2c-4.4 0-8 3.5-8 8 0 6 8 12 8 12s8-6 8-12c0-4.5-3.6-8-8-8z" fill="var(--coral-deep)"/>
+    <circle cx="12" cy="10" r="3" fill="#fff"/>
+  </symbol>
+  <symbol id="ic-home" viewBox="0 0 24 24">
+    <path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" fill="currentColor"/>
+  </symbol>
+  <symbol id="ic-settings" viewBox="0 0 24 24">
+    <path d="M4 7h10M17 7h3M4 12h3M8 12h12M4 17h10M17 17h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="14" cy="7" r="2.2" fill="var(--bg)" stroke="currentColor" stroke-width="1.8"/>
+    <circle cx="6" cy="12" r="2.2" fill="var(--bg)" stroke="currentColor" stroke-width="1.8"/>
+    <circle cx="14" cy="17" r="2.2" fill="var(--bg)" stroke="currentColor" stroke-width="1.8"/>
+  </symbol>
+  <symbol id="ic-scan" viewBox="0 0 24 24">
+    <path d="M4 8V6a2 2 0 0 1 2-2h2M4 16v2a2 2 0 0 0 2 2h2M20 8V6a2 2 0 0 0-2-2h-2M20 16v2a2 2 0 0 1-2 2h-2" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <circle cx="12" cy="12" r="3" fill="currentColor"/>
+  </symbol>
+  <symbol id="ic-send" viewBox="0 0 24 24">
+    <path d="M3 11l18-8-8 18-2.5-7.5z" fill="currentColor"/>
+  </symbol>
+  <symbol id="ic-shield" viewBox="0 0 24 24">
+    <path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5z" fill="currentColor"/>
+  </symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24">
+    <circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2.2" fill="none"/>
+    <path d="M20 20l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-avatar-blank" viewBox="0 0 24 24">
+    <circle cx="12" cy="9" r="4" fill="var(--ink-faint)"/>
+    <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="var(--ink-faint)"/>
+  </symbol>
+  <symbol id="ic-plan" viewBox="0 0 24 24">
+    <rect x="3" y="4" width="18" height="16" rx="3" fill="currentColor" opacity=".15"/>
+    <path d="M7 9h10M7 13h10M7 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+</defs>
+</svg>
+
+<div class="app-wrap">
+
+  <!-- ============ DESKTOP INFO PANEL ============ -->
+  <aside class="info-panel">
+    <div>
+      <h1>FIDR TAGS</h1>
+      <p class="tagline">An eco-friendly waterproof sticker with a hidden tracker, so you can see
+        where your personal items are through an app &mdash; scan a lost item's sticker and it
+        opens the owner's anonymous profile so you can reunite them, no names or numbers shared.</p>
+    </div>
+    <div class="feature">
+      <svg><use href="#ic-shield"/></svg>
+      <div><div class="t">Stays anonymous</div><div class="d">Finders only ever see a username, never a real name or phone number.</div></div>
+    </div>
+    <div class="feature">
+      <svg><use href="#ic-scan"/></svg>
+      <div><div class="t">Hidden tracker</div><div class="d">Scratch-resistant, waterproof &mdash; the tracker hides in a design detail, like the eye of the whale.</div></div>
+    </div>
+    <div class="feature">
+      <svg><use href="#ic-pin"/></svg>
+      <div><div class="t">Live location</div><div class="d">Premium and Max plans show the exact spot a lost item was last seen.</div></div>
+    </div>
+    <div class="jump-title">Jump to a screen</div>
+    <div class="jump-grid" id="jumpGrid"></div>
+  </aside>
+
+  <!-- ============ PHONE ============ -->
+  <div class="phone-frame">
+    <div class="screen-viewport" id="viewport">
+
+      <!-- ---------- PROFILE ---------- -->
+      <section class="screen" id="screen-profile" data-screen="profile">
+        <div class="screen-header">
+          <span class="screen-title">My Profile</span>
+          <div class="icon-btn-wrap">
+            <button class="icon-btn" data-nav="bag" aria-label="Bag"><svg><use href="#ic-bag"/></svg></button>
+            <span class="badge" id="bagBadge" style="display:none;">0</span>
+          </div>
+        </div>
+
+        <div class="profile-top">
+          <div class="avatar" id="profileAvatar" style="width:84px;height:84px;"></div>
+          <button class="btn btn-ghost" style="padding:6px 14px;font-size:.75rem;" data-nav="settings">Edit profile</button>
+          <div class="username-line" id="profileUsername">@username112</div>
+        </div>
+
+        <div class="stack">
+          <div class="card stack" style="gap:8px;">
+            <div class="lock-note"><svg><use href="#ic-shield"/></svg> Only visible to you</div>
+            <div><span class="muted">Name</span><div id="profileName" style="font-weight:800;">Dasha</div></div>
+            <div><span class="muted">Phone number</span><div id="profilePhone" style="font-weight:800;">04 111 111 111</div></div>
+          </div>
+
+          <div>
+            <div class="muted" style="margin-bottom:8px;font-weight:800;">My items</div>
+            <div class="chip-row" id="profileItems"></div>
+          </div>
+
+          <div class="card row between" data-nav="subscriptions" style="cursor:pointer;">
+            <div>
+              <div class="muted">Subscription</div>
+              <div style="font-weight:800;" id="profilePlanLabel">Max &mdash; $10/month</div>
+            </div>
+            <svg style="width:18px;height:18px;color:var(--ink-faint);"><use href="#ic-back" style="transform:rotate(180deg);"/></svg>
+          </div>
+
+          <div class="card row between" data-nav="shop" style="cursor:pointer;">
+            <div class="row" style="gap:12px;">
+              <svg style="width:20px;height:20px;color:var(--coral-deep);"><use href="#ic-bag"/></svg>
+              <span style="font-weight:800;">Shop stickers</span>
+            </div>
+            <svg style="width:18px;height:18px;color:var(--ink-faint);"><use href="#ic-back" style="transform:rotate(180deg);"/></svg>
+          </div>
+
+          <button class="cta-scan" data-nav="scan">
+            <div class="row" style="justify-content:center;gap:10px;">
+              <svg style="width:22px;height:22px;"><use href="#ic-scan"/></svg>
+              <span class="big">SCAN ITEMS!</span>
+            </div>
+          </button>
+
+          <div>
+            <div class="row between" style="margin-bottom:8px;">
+              <span class="muted" style="font-weight:800;">Lost</span>
+              <svg style="width:16px;height:16px;color:var(--coral-deep);"><use href="#ic-search"/></svg>
+            </div>
+            <div id="lostList" class="stack" style="gap:8px;"></div>
+          </div>
+
+          <div class="stat-pair">
+            <div class="stat-pill"><span class="num" id="itemsFoundNum">2</span><span class="muted">items found</span></div>
+            <div class="stat-pill"><span class="num" id="lostCountNum">1</span><span class="muted">still lost</span></div>
+          </div>
+
+          <button class="btn btn-sage block" data-nav="location">
+            <svg style="width:18px;height:18px;"><use href="#ic-pin"/></svg> Check locations
+          </button>
+        </div>
+      </section>
+
+      <!-- ---------- SCAN ---------- -->
+      <section class="screen" id="screen-scan" data-screen="scan">
+        <div class="screen-header">
+          <button class="icon-btn" data-nav="profile" aria-label="Back"><svg><use href="#ic-back"/></svg></button>
+          <span class="screen-title">Scan a sticker</span>
+        </div>
+
+        <div class="viewfinder" id="viewfinder">
+          <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+          <div class="scan-line"></div>
+          <div class="sticker-target">
+            <div class="disc"><svg id="scanTargetIcon"><use href="#ic-whale"/></svg></div>
+            <span class="scan-me-pill">scan me</span>
+          </div>
+        </div>
+
+        <div class="scan-status" id="scanStatus">Point your camera at a sticker</div>
+
+        <div class="scan-btn-wrap">
+          <button class="scan-btn" id="scanBtn" aria-label="Scan"></button>
+        </div>
+      </section>
+
+      <!-- ---------- FOUND STICKER ---------- -->
+      <section class="screen" id="screen-found" data-screen="found">
+        <div class="screen-header">
+          <button class="icon-btn" data-nav="profile" aria-label="Back"><svg><use href="#ic-back"/></svg></button>
+          <span class="screen-title">Sticker found!</span>
+          <div class="icon-btn-wrap">
+            <button class="icon-btn" data-nav="bag" aria-label="Bag"><svg><use href="#ic-bag"/></svg></button>
+            <span class="badge" id="bagBadge2" style="display:none;">0</span>
+          </div>
+        </div>
+
+        <div class="found-card">
+          <div class="avatar" id="foundAvatar"></div>
+          <div class="handle" id="foundHandle">@username221</div>
+          <button class="btn btn-coral-deep block" id="notifyBtn" style="margin-top:16px;">Notify that item is found!</button>
+          <div class="notice-banner" id="notifyBanner"><svg style="width:16px;height:16px;"><use href="#ic-check"/></svg> They've been notified 🎉</div>
+        </div>
+
+        <div class="other-items">
+          <div class="muted" style="font-weight:800;margin-bottom:8px;">Other lost items</div>
+          <div class="stack" id="otherLostItems" style="gap:8px;"></div>
+        </div>
+
+        <div class="stack">
+          <button class="action-row" data-nav="messaging">
+            <span class="ic" style="background:var(--lavender);"><svg><use href="#ic-message"/></svg></span>
+            <span style="font-weight:800;">Message</span>
+          </button>
+          <button class="action-row" id="callBtn">
+            <span class="ic" style="background:var(--sky);"><svg><use href="#ic-call"/></svg></span>
+            <span style="font-weight:800;">Call</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ---------- MESSAGING ---------- -->
+      <section class="screen" id="screen-messaging" data-screen="messaging">
+        <div class="screen-header">
+          <button class="icon-btn" data-nav="found" aria-label="Back"><svg><use href="#ic-back"/></svg></button>
+          <span class="screen-title" id="chatHandle">@username221</span>
+        </div>
+        <div class="chat-area" id="chatArea"></div>
+        <div class="composer">
+          <input type="text" id="chatInput" placeholder="Type a message…" maxlength="120">
+          <button class="send-btn" id="sendBtn" aria-label="Send"><svg><use href="#ic-send"/></svg></button>
+        </div>
+        <div class="goback-row"><button data-nav="found">Go back?</button></div>
+      </section>
+
+      <!-- ---------- LOCATION ---------- -->
+      <section class="screen" id="screen-location" data-screen="location">
+        <div class="screen-header">
+          <button class="icon-btn" data-nav="profile" aria-label="Back"><svg><use href="#ic-back"/></svg></button>
+          <span class="screen-title">Location</span>
+          <div class="icon-btn-wrap">
+            <button class="icon-btn" data-nav="bag" aria-label="Bag"><svg><use href="#ic-bag"/></svg></button>
+          </div>
+        </div>
+        <div class="map">
+          <div class="road"></div>
+          <div class="block" style="top:8%;left:8%;width:26%;height:20%;">School</div>
+          <div class="block" style="top:6%;right:6%;width:30%;height:24%;background:var(--sky);">Home</div>
+          <div class="block" style="bottom:8%;left:10%;width:28%;height:34%;"></div>
+          <div class="block" style="bottom:10%;right:10%;width:16%;height:24%;background:var(--sky);"></div>
+          <div class="pin" style="top:52%;left:42%;"><svg><use href="#ic-pin"/></svg></div>
+          <div class="pin-label" style="top:52%;left:42%;">Pencil case</div>
+        </div>
+        <p class="muted" style="text-align:center;">This is the last seen location of your lost item. Exact location is a Premium/Max feature.</p>
+      </section>
+
+      <!-- ---------- SHOP ---------- -->
+      <section class="screen" id="screen-shop" data-screen="shop">
+        <div class="screen-header">
+          <button class="icon-btn" data-nav="profile" aria-label="Back"><svg><use href="#ic-back"/></svg></button>
+          <span class="screen-title">Shop stickers</span>
+          <div class="icon-btn-wrap">
+            <button class="icon-btn" data-nav="bag" aria-label="Bag"><svg><use href="#ic-bag"/></svg></button>
+            <span class="badge" id="bagBadge3" style="display:none;">0</span>
+          </div>
+        </div>
+        <div class="price-legend">
+          <span class="pill" style="background:var(--sage);">Small $5</span>
+          <span class="pill" style="background:var(--butter);">Medium $7</span>
+          <span class="pill" style="background:var(--coral);">Large $10</span>
+        </div>
+        <div class="shop-grid" id="shopGrid"></div>
+      </section>
+
+      <!-- ---------- BAG ---------- -->
+      <section class="screen" id="screen-bag" data-screen="bag">
+        <div class="screen-header">
+          <button class="icon-btn" data-nav="shop" aria-label="Back"><svg><use href="#ic-back"/></svg></button>
+          <span class="screen-title">Bag</span>
+        </div>
+        <div class="stack" id="bagList"></div>
+        <div class="bag-total"><span>Total</span><span id="bagTotal">$0.00</span></div>
+        <div class="stack">
+          <button class="btn btn-coral-deep block" id="buyBtn">Buy?</button>
+          <button class="btn btn-butter block" data-nav="shop">Go back?</button>
+        </div>
+      </section>
+
+      <!-- ---------- SUBSCRIPTIONS + COST ---------- -->
+      <section class="screen" id="screen-subscriptions" data-screen="subscriptions">
+        <div class="screen-header">
+          <button class="icon-btn" data-nav="profile" aria-label="Back"><svg><use href="#ic-back"/></svg></button>
+          <span class="screen-title">Subscriptions</span>
+          <div class="icon-btn-wrap">
+            <button class="icon-btn" data-nav="bag" aria-label="Bag"><svg><use href="#ic-bag"/></svg></button>
+          </div>
+        </div>
+
+        <div class="plan-table" id="planTable"></div>
+        <div class="plan-picks" id="planPicks"></div>
+
+        <div style="margin-top:26px;">
+          <div class="muted" style="font-weight:800;margin-bottom:6px;">Cost <span style="font-weight:600;">(scroll down)</span></div>
+          <div class="card cost-list">
+            <div class="cost-row" data-plan="basic"><span>Basic</span><span>Free</span></div>
+            <div class="cost-row" data-plan="premium"><span>Premium</span><span>$5/month</span></div>
+            <div class="cost-row" data-plan="max"><span>Max</span><span>$10/month</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- SETTINGS ---------- -->
+      <section class="screen" id="screen-settings" data-screen="settings">
+        <div class="screen-header">
+          <button class="icon-btn" data-nav="profile" aria-label="Back"><svg><use href="#ic-back"/></svg></button>
+          <span class="screen-title">Settings</span>
+        </div>
+
+        <div class="settings-avatar">
+          <div class="avatar" id="settingsAvatar" style="width:84px;height:84px;"></div>
+          <button class="btn btn-lavender cycle-btn" id="cycleAvatarBtn">Change avatar</button>
+        </div>
+
+        <div class="stack">
+          <div class="field">
+            <label>Name</label>
+            <div class="field-row">
+              <input type="text" id="nameInput" value="Dasha">
+              <button class="edit-icon" data-focus="nameInput" aria-label="Edit name"><svg><use href="#ic-edit"/></svg></button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Username</label>
+            <div class="field-row">
+              <span style="font-weight:700;color:var(--ink-faint);">@</span>
+              <input type="text" id="usernameInput" value="username112">
+              <button class="edit-icon" data-focus="usernameInput" aria-label="Edit username"><svg><use href="#ic-edit"/></svg></button>
+            </div>
+          </div>
+
+          <div>
+            <div class="muted" style="font-weight:800;margin:6px 0 8px;">Delete items</div>
+            <div class="stack" id="deleteItemsList" style="gap:8px;"></div>
+            <p class="muted" style="margin-top:8px;">Used when the item that a sticker is on is no longer being used.</p>
+          </div>
+
+          <div class="reset-link"><button id="resetBtn">Reset demo data</button></div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ---------- overlays (inside phone) ---------- -->
+    <div class="sheet-backdrop" id="sizeSheetBackdrop">
+      <div class="sheet">
+        <h3 id="sheetItemName" style="margin-bottom:14px;">Whale sticker</h3>
+        <div class="size-opt" data-size="Small" data-price="5">Small<span>$5.00</span></div>
+        <div class="size-opt" data-size="Medium" data-price="7">Medium<span>$7.00</span></div>
+        <div class="size-opt" data-size="Large" data-price="10">Large<span>$10.00</span></div>
+        <button class="btn btn-coral-deep block" id="addToBagBtn" style="margin-top:8px;">Add to bag</button>
+      </div>
+    </div>
+
+    <div class="call-overlay" id="callOverlay">
+      <div class="avatar" id="callAvatar"></div>
+      <div class="handle" id="callHandle" style="font-weight:800;font-size:1.1rem;">@username221</div>
+      <div class="status" id="callStatus">Calling…</div>
+      <button class="hangup" id="hangupBtn"><svg><use href="#ic-hangup"/></svg></button>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- sticker catalogue ---------------- */
+  var STICKERS = [
+    {id:'whale', name:'Whale', icon:'ic-whale'},
+    {id:'daisy', name:'Daisy', icon:'ic-daisy'},
+    {id:'coralflower', name:'Flower', icon:'ic-coralflower'},
+    {id:'smiley', name:'Smiley', icon:'ic-smiley'},
+    {id:'drink', name:'Drink', icon:'ic-drink'},
+    {id:'palm', name:'Palm tree', icon:'ic-palm'},
+    {id:'pine', name:'Pine tree', icon:'ic-pine'},
+    {id:'mug', name:'Mug', icon:'ic-mug'},
+    {id:'apple', name:'Apple', icon:'ic-apple'},
+    {id:'book', name:'Book', icon:'ic-book'},
+    {id:'tulip', name:'Tulip', icon:'ic-tulip'},
+    {id:'figure', name:'Buddy', icon:'ic-figure'}
+  ];
+  function stickerById(id){ for(var i=0;i<STICKERS.length;i++){ if(STICKERS[i].id===id) return STICKERS[i]; } return STICKERS[0]; }
+
+  var AVATAR_ICONS = ['ic-avatar-blank','ic-daisy','ic-coralflower','ic-smiley','ic-whale','ic-tulip'];
+
+  /* ---------------- default state ----------------
+     Privacy note: `me.name` and `me.phone` are only ever read by renderProfile()
+     and renderSettings() — the two screens that show YOUR OWN data. The found-
+     sticker / messaging screens only ever read `.username`, `.avatar` and
+     `.lostItems` from a scan target, so a finder can never see a real name or
+     phone number — matching the "anonymous, username-only" rule from the design. */
+  var STORAGE_KEY = 'fidr-tags-state-v1';
+  function defaultState(){
+    return {
+      me: {
+        name:'Dasha', username:'username112', phone:'04 111 111 111',
+        avatarIcon:'ic-avatar-blank',
+        items:['Waterbottle','Lunchbox','Pencil case'],
+        lostItems:['Pencil case'],
+        itemsFound:2, plan:'max'
+      },
+      bag: [
+        {uid:1, stickerId:'whale', size:'Small', price:5},
+        {uid:2, stickerId:'coralflower', size:'Medium', price:7}
+      ],
+      bagUidSeq: 3,
+      scanIndex: 0,
+      activeTarget: 0,
+      scanTargets: [
+        {username:'username221', avatarIcon:'ic-daisy', lostItems:[{name:'Leaf clip', icon:'ic-pine'}]},
+        {username:'username884', avatarIcon:'ic-tulip', lostItems:[{name:'Keyring', icon:'ic-coralflower'}]},
+        {username:'username017', avatarIcon:'ic-smiley', lostItems:[{name:'Water bottle', icon:'ic-drink'}]}
+      ],
+      notified: {},
+      messages: {
+        username221: [
+          {from:'me', text:'i found item'},
+          {from:'them', text:'thank you!'},
+          {from:'me', text:"it's at the front office"},
+          {from:'them', text:'thanksss!'}
+        ]
+      }
+    };
+  }
+  var state;
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){ return JSON.parse(raw); }
+    }catch(e){}
+    return defaultState();
+  }
+  function saveState(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+  state = loadState();
+
+  /* ---------------- tiny dom helpers ---------------- */
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  function svgUse(id){ return '<svg><use href="#'+id+'"/></svg>'; }
+  function money(n){ return '$'+n.toFixed(2); }
+
+  /* ---------------- router ---------------- */
+  var SCREENS = ['profile','scan','found','messaging','location','shop','bag','subscriptions','settings'];
+  var current = 'profile';
+  function showScreen(name){
+    if(SCREENS.indexOf(name)===-1) return;
+    current = name;
+    SCREENS.forEach(function(s){
+      $('#screen-'+s).classList.toggle('active', s===name);
+    });
+    renderAll();
+    updateJumpGrid();
+    var vp = $('#viewport'); if(vp) vp.scrollTop = 0;
+  }
+  document.addEventListener('click', function(e){
+    var el = e.target.closest('[data-nav]');
+    if(el){ showScreen(el.getAttribute('data-nav')); }
+  });
+
+  /* ---------------- toast ---------------- */
+  var toastTimer;
+  function showToast(msg){
+    var t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 1800);
+  }
+
+  /* ---------------- render: profile ---------------- */
+  function renderProfile(){
+    $('#profileAvatar').innerHTML = svgUse(state.me.avatarIcon);
+    $('#profileUsername').textContent = '@'+state.me.username;
+    $('#profileName').textContent = state.me.name;
+    $('#profilePhone').textContent = state.me.phone;
+
+    $('#profileItems').innerHTML = state.me.items.map(function(it){
+      return '<span class="chip">'+it+'</span>';
+    }).join('') || '<span class="muted">No items yet</span>';
+
+    var planNames = {basic:'Basic', premium:'Premium', max:'Max'};
+    var planPrices = {basic:'Free', premium:'$5/month', max:'$10/month'};
+    $('#profilePlanLabel').textContent = planNames[state.me.plan] + ' — ' + planPrices[state.me.plan];
+
+    $('#lostList').innerHTML = state.me.lostItems.length ? state.me.lostItems.map(function(name){
+      return '<div class="lost-row"><svg style="width:18px;height:18px;color:var(--coral-deep);">'+ '<use href="#ic-search"/>' +'</svg>'+
+        '<span style="flex:1;font-weight:700;">'+name+'</span>'+
+        '<button class="btn btn-sage" style="padding:8px 12px;font-size:.72rem;" data-nav="location">Locate</button></div>';
+    }).join('') : '<p class="muted">Nothing lost right now 🎉</p>';
+
+    $('#itemsFoundNum').textContent = state.me.itemsFound;
+    $('#lostCountNum').textContent = state.me.lostItems.length;
+
+    var count = state.bag.length;
+    ['#bagBadge','#bagBadge2','#bagBadge3'].forEach(function(sel){
+      var b = $(sel); if(!b) return;
+      b.style.display = count ? 'flex' : 'none';
+      b.textContent = count;
+    });
+  }
+
+  /* ---------------- render: scan ---------------- */
+  var scanning = false;
+  function currentTarget(){ return state.scanTargets[state.activeTarget % state.scanTargets.length]; }
+  function renderScanTargetIcon(){
+    $('#scanTargetIcon').innerHTML = '<use href="#'+STICKERS[state.scanIndex % STICKERS.length].icon+'"/>';
+  }
+  function resetScanScreen(){
+    scanning = false;
+    $('#viewfinder').classList.remove('scanning');
+    $('#scanStatus').textContent = 'Point your camera at a sticker';
+    renderScanTargetIcon();
+  }
+  $('#scanBtn').addEventListener('click', function(){
+    if(scanning) return;
+    scanning = true;
+    $('#viewfinder').classList.add('scanning');
+    $('#scanStatus').textContent = 'Scanning…';
+    setTimeout(function(){
+      $('#viewfinder').classList.remove('scanning');
+      $('#scanStatus').textContent = 'Sticker found! 🎉';
+      setTimeout(function(){
+        state.activeTarget = state.scanIndex;
+        state.scanIndex = (state.scanIndex + 1) % state.scanTargets.length;
+        showScreen('found');
+        saveState();
+      }, 700);
+    }, 1400);
+  });
+
+  /* ---------------- render: found ---------------- */
+  function renderFound(){
+    var t = currentTarget();
+    $('#foundAvatar').innerHTML = svgUse(t.avatarIcon);
+    $('#foundHandle').textContent = '@'+t.username;
+    var notified = !!state.notified[t.username];
+    $('#notifyBanner').classList.toggle('show', notified);
+    $('#notifyBtn').style.display = notified ? 'none' : 'flex';
+    $('#otherLostItems').innerHTML = t.lostItems.map(function(li){
+      return '<div class="row" style="background:var(--white);border-radius:var(--r-control);padding:10px 12px;box-shadow:var(--shadow-soft);">'+
+        '<svg style="width:22px;height:22px;"><use href="#'+li.icon+'"/></svg>'+
+        '<span style="font-weight:700;">'+li.name+'</span></div>';
+    }).join('');
+  }
+  $('#notifyBtn').addEventListener('click', function(){
+    var t = currentTarget();
+    state.notified[t.username] = true;
+    if(!state.messages[t.username]){ state.messages[t.username] = []; }
+    state.messages[t.username].push({from:'me', text:'I found your item — it\'s safe with me!'});
+    saveState();
+    renderFound();
+    showToast("They've been notified!");
+  });
+  $('#callBtn').addEventListener('click', function(){
+    var t = currentTarget();
+    $('#callAvatar').innerHTML = svgUse(t.avatarIcon);
+    $('#callHandle').textContent = '@'+t.username;
+    $('#callStatus').textContent = 'Calling…';
+    $('#callOverlay').classList.add('show');
+    var ring = setTimeout(function(){ $('#callStatus').textContent = 'Connected'; }, 1400);
+    $('#callOverlay').dataset.ringTimer = '';
+    window.__ringTimer = ring;
+  });
+  $('#hangupBtn').addEventListener('click', function(){
+    clearTimeout(window.__ringTimer);
+    $('#callStatus').textContent = 'Call ended';
+    setTimeout(function(){ $('#callOverlay').classList.remove('show'); }, 500);
+  });
+
+  /* ---------------- render: messaging ---------------- */
+  var REPLY_POOL = ['thank you so much!!', 'omg you\'re a lifesaver', 'appreciate it heaps 🙏', 'thanksss!'];
+  function renderMessaging(){
+    var t = currentTarget();
+    $('#chatHandle').textContent = '@'+t.username;
+    var msgs = state.messages[t.username] || [];
+    $('#chatArea').innerHTML = msgs.map(function(m){
+      return '<div class="bubble '+(m.from==='me'?'me':'them')+'">'+escapeHtml(m.text)+'</div>';
+    }).join('');
+    $('#chatArea').scrollTop = $('#chatArea').scrollHeight;
+  }
+  function escapeHtml(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+  function sendMessage(){
+    var input = $('#chatInput');
+    var val = input.value.trim();
+    if(!val) return;
+    var t = currentTarget();
+    if(!state.messages[t.username]) state.messages[t.username] = [];
+    state.messages[t.username].push({from:'me', text:val});
+    input.value = '';
+    renderMessaging();
+    saveState();
+    setTimeout(function(){
+      var reply = REPLY_POOL[Math.floor(Math.random()*REPLY_POOL.length)];
+      state.messages[t.username].push({from:'them', text:reply});
+      saveState();
+      if(current==='messaging'){ renderMessaging(); }
+    }, 900);
+  }
+  $('#sendBtn').addEventListener('click', sendMessage);
+  $('#chatInput').addEventListener('keydown', function(e){ if(e.key==='Enter') sendMessage(); });
+
+  /* ---------------- render: shop / bag ---------------- */
+  function renderShopGrid(){
+    $('#shopGrid').innerHTML = STICKERS.map(function(s){
+      return '<button class="shop-item" data-sticker="'+s.id+'"><svg><use href="#'+s.icon+'"/></svg><span>'+s.name+'</span></button>';
+    }).join('');
+  }
+  var sheetStickerId = null, sheetSize = 'Small', sheetPrice = 5;
+  document.addEventListener('click', function(e){
+    var item = e.target.closest('.shop-item');
+    if(item){
+      sheetStickerId = item.getAttribute('data-sticker');
+      var s = stickerById(sheetStickerId);
+      $('#sheetItemName').textContent = s.name + ' sticker';
+      $all('.size-opt').forEach(function(o){ o.classList.remove('selected'); });
+      $('.size-opt[data-size="Small"]').classList.add('selected');
+      sheetSize = 'Small'; sheetPrice = 5;
+      $('#sizeSheetBackdrop').classList.add('show');
+    }
+    var sizeOpt = e.target.closest('.size-opt');
+    if(sizeOpt){
+      $all('.size-opt').forEach(function(o){ o.classList.remove('selected'); });
+      sizeOpt.classList.add('selected');
+      sheetSize = sizeOpt.getAttribute('data-size');
+      sheetPrice = parseFloat(sizeOpt.getAttribute('data-price'));
+    }
+    if(e.target === $('#sizeSheetBackdrop')){
+      $('#sizeSheetBackdrop').classList.remove('show');
+    }
+  });
+  $('#addToBagBtn').addEventListener('click', function(){
+    state.bag.push({uid: state.bagUidSeq++, stickerId: sheetStickerId, size: sheetSize, price: sheetPrice});
+    saveState();
+    $('#sizeSheetBackdrop').classList.remove('show');
+    renderProfile();
+    showToast('Added to bag');
+  });
+
+  function renderBag(){
+    if(!state.bag.length){
+      $('#bagList').innerHTML = '<div class="empty-note">Your bag is empty</div>';
+    }else{
+      $('#bagList').innerHTML = state.bag.map(function(b){
+        var s = stickerById(b.stickerId);
+        return '<div class="bag-item">'+
+          '<span class="ic"><svg><use href="#'+s.icon+'"/></svg></span>'+
+          '<span class="meta"><div class="name">'+s.name+' sticker</div><div class="muted">Size: '+b.size+'</div></span>'+
+          '<span class="price">'+money(b.price)+'</span>'+
+          '<button class="remove" data-remove="'+b.uid+'"><svg style="width:18px;height:18px;"><use href="#ic-close"/></svg></button>'+
+          '</div>';
+      }).join('');
+    }
+    var total = state.bag.reduce(function(sum,b){ return sum+b.price; }, 0);
+    $('#bagTotal').textContent = money(total);
+  }
+  document.addEventListener('click', function(e){
+    var rm = e.target.closest('[data-remove]');
+    if(rm){
+      var uid = parseInt(rm.getAttribute('data-remove'),10);
+      state.bag = state.bag.filter(function(b){ return b.uid!==uid; });
+      saveState(); renderBag(); renderProfile();
+    }
+  });
+  $('#buyBtn').addEventListener('click', function(){
+    if(!state.bag.length){ showToast('Your bag is empty'); return; }
+    state.bag = [];
+    saveState();
+    renderBag(); renderProfile();
+    showToast('Thanks for your purchase! 🎉');
+    setTimeout(function(){ showScreen('profile'); }, 900);
+  });
+
+  /* ---------------- render: subscriptions / cost ---------------- */
+  var PLANS = ['basic','premium','max'];
+  var PLAN_LABEL = {basic:'Basic', premium:'Premium', max:'Max'};
+  var PLAN_ROWS = [
+    {label:'Stickers', vals:{basic:'3', premium:'5', max:'∞'}},
+    {label:'Exact location', vals:{basic:false, premium:true, max:true}},
+    {label:'Calls', vals:{basic:false, premium:false, max:true}},
+    {label:'Messages', vals:{basic:true, premium:true, max:true}}
+  ];
+  function cellMark(v){
+    if(v===true) return '<span style="color:var(--sage-deep);font-weight:900;">✓</span>';
+    if(v===false) return '<span style="color:var(--ink-faint);">–</span>';
+    return v;
+  }
+  function renderSubscriptions(){
+    var html = '<div class="cell head">Feature</div>';
+    PLANS.forEach(function(p){ html += '<div class="cell head'+(p===state.me.plan?' current':'')+'">'+PLAN_LABEL[p]+'</div>'; });
+    PLAN_ROWS.forEach(function(row){
+      html += '<div class="cell row-head">'+row.label+'</div>';
+      PLANS.forEach(function(p){ html += '<div class="cell'+(p===state.me.plan?' current':'')+'">'+cellMark(row.vals[p])+'</div>'; });
+    });
+    $('#planTable').innerHTML = html;
+
+    var picks = '<div></div>';
+    PLANS.forEach(function(p){
+      picks += '<button class="btn pick-btn '+(p===state.me.plan?'btn-sky':'btn-ghost')+'" data-plan-pick="'+p+'">'+(p===state.me.plan?'Current':'Choose')+'</button>';
+    });
+    $('#planPicks').innerHTML = picks;
+
+    $all('.cost-row').forEach(function(r){
+      r.classList.toggle('current', r.getAttribute('data-plan')===state.me.plan);
+    });
+  }
+  document.addEventListener('click', function(e){
+    var pick = e.target.closest('[data-plan-pick]');
+    if(pick){
+      state.me.plan = pick.getAttribute('data-plan-pick');
+      saveState(); renderSubscriptions(); renderProfile();
+      showToast(PLAN_LABEL[state.me.plan]+' plan selected');
+    }
+  });
+
+  /* ---------------- render: settings ---------------- */
+  function renderSettings(){
+    $('#settingsAvatar').innerHTML = svgUse(state.me.avatarIcon);
+    $('#nameInput').value = state.me.name;
+    $('#usernameInput').value = state.me.username;
+    $('#deleteItemsList').innerHTML = ['Pencil case','Lunchbox','Waterbottle'].map(function(name){
+      var on = state.me.items.indexOf(name) !== -1;
+      return '<div class="check-row"><span class="checkbox'+(on?' checked':'')+'" data-toggle-item="'+name+'">'+svgUse('ic-check')+'</span>'+
+        '<span style="font-weight:700;">'+name+'</span></div>';
+    }).join('');
+  }
+  $('#nameInput').addEventListener('input', function(){ state.me.name = this.value || 'Dasha'; saveState(); renderProfile(); });
+  $('#usernameInput').addEventListener('input', function(){ state.me.username = (this.value||'username').replace(/\s/g,''); saveState(); renderProfile(); });
+  $all('.edit-icon').forEach(function(btn){
+    btn.addEventListener('click', function(){ $('#'+btn.getAttribute('data-focus')).focus(); });
+  });
+  $('#cycleAvatarBtn').addEventListener('click', function(){
+    var i = AVATAR_ICONS.indexOf(state.me.avatarIcon);
+    state.me.avatarIcon = AVATAR_ICONS[(i+1) % AVATAR_ICONS.length];
+    saveState(); renderSettings(); renderProfile();
+  });
+  document.addEventListener('click', function(e){
+    var box = e.target.closest('[data-toggle-item]');
+    if(box){
+      var name = box.getAttribute('data-toggle-item');
+      var idx = state.me.items.indexOf(name);
+      if(idx===-1){ state.me.items.push(name); } else { state.me.items.splice(idx,1); }
+      saveState(); renderSettings(); renderProfile();
+    }
+  });
+  $('#resetBtn').addEventListener('click', function(){
+    state = defaultState();
+    saveState();
+    renderAll();
+    showToast('Demo data reset');
+  });
+
+  /* ---------------- desktop jump grid ---------------- */
+  function updateJumpGrid(){
+    var grid = $('#jumpGrid'); if(!grid) return;
+    $all('button', grid).forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-nav')===current);
+    });
+  }
+  (function buildJumpGrid(){
+    var labels = {profile:'Profile', scan:'Scan', found:'Found sticker', messaging:'Messaging', location:'Location', shop:'Shop', bag:'Bag', subscriptions:'Subscriptions', settings:'Settings'};
+    $('#jumpGrid').innerHTML = SCREENS.map(function(s){
+      return '<button data-nav="'+s+'">'+labels[s]+'</button>';
+    }).join('');
+  })();
+
+  /* ---------------- render all ---------------- */
+  function renderAll(){
+    renderProfile();
+    if(current==='scan') resetScanScreen();
+    renderFound();
+    renderMessaging();
+    renderShopGrid();
+    renderBag();
+    renderSubscriptions();
+    renderSettings();
+  }
+
+  renderAll();
+  showScreen('profile');
+})();
+</script>
+</body>
+</html>
